@@ -20,6 +20,23 @@ const index = (req, res, next)=>{
 
 
 }
+
+// show the list of employee
+const indexPagination = (req, res, next)=>{
+    Employee.paginate({}, {page: req.query.page , limit: req.query.limit})
+    .then(EmployeeData =>{
+        res.json({
+            EmployeeData
+        })
+    })
+    .catch(error=>{
+        res.json({
+            message: 'An error occured !!'
+        })
+    })
+
+
+}
 // show only one employee
 const show = (req, res, next)=>{
       let employeeID = req.body.employeeID
@@ -38,6 +55,9 @@ const show = (req, res, next)=>{
 
 
 }
+
+
+
 
 
 // ADD employee in db
@@ -122,6 +142,6 @@ const deleteEmployee = (req, res, next)=>{
 
 
 module.exports = {
-    index, show, store, update, deleteEmployee
+    indexPagination, show, store, update, deleteEmployee
 }
 
