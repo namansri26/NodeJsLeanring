@@ -10,6 +10,7 @@ router.post('/show', authenticate,  EmployeeController.show)
 router.post('/store', authenticate, upload.single('avatar'),  EmployeeController.store)
 router.post('/update', authenticate,  EmployeeController.update)
 router.post('/delete', authenticate, EmployeeController.deleteEmployee)
+router.post('/uploaduser',  EmployeeController.uploadExcel)
 module.exports = router
 
 

@@ -1,7 +1,7 @@
 const { response } = require('express')
 const Employee = require('../models/EmployeeModel')
 const { error } = require('console')
-
+const csvtojson = require('csvtojson');
 
 // show the list of employee
 const index = (req, res, next)=>{
@@ -139,9 +139,48 @@ const deleteEmployee = (req, res, next)=>{
 
 }
 
+const uploadExcel = async (req, res, next)=>{
+    try {
+        
+        if (!req.body.file) {
+          return res.status(400).json({ message: 'No file uploaded!' });
+        }
+    
+        // Read the uploaded Excel file and convert to JSON
+        const jsonData = await csvtojson({ // Use файланализ option for correct Russian parsing
+          delimiter: ',', // Adjust delimiter if needed
+          includeColumns: [ // Specify column names to map to User model properties (if different)
+            'name',
+            'email'
+            // ... other user properties
+          ],
+        }).fromFile(req.body.file.path);
+    
+        // Validate data before insertion (optional)
+        const validUsers = jsonData.filter(user => {
+          // Implement validation logic for required fields, data types, etc.
+          return user.name && user.email;
+        });
+    
+        // Create users in bulk using Mongoose insertMany
+        await Employee.insertMany(validUsers);
+    
+        res.status(201).json({ message: 'Users created successfully!' });
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Error creating users!' });
+      } finally {
+       
+      }
+
+}
+
+
+
+
 
 
 module.exports = {
-    indexPagination, show, store, update, deleteEmployee
+    indexPagination, show, store, update, deleteEmployee , uploadExcel
 }
 
