@@ -1,7 +1,9 @@
 const { response } = require('express')
 const Employee = require('../models/EmployeeModel')
+const UserRole = require('../models/UserRoles')
 const { error } = require('console')
 const csvtojson = require('csvtojson');
+const upload = require('../middleware/upload')
 
 // show the list of employee
 const index = (req, res, next)=>{
@@ -139,13 +141,14 @@ const deleteEmployee = (req, res, next)=>{
 
 }
 
-const uploadExcel = async (req, res, next)=>{
+const uploadExcel = async (req,res, next)=>{
     try {
-        
-        if (!req.body.file) {
+        console.log(req.file)
+        if (!req.file) {
           return res.status(400).json({ message: 'No file uploaded!' });
         }
-    
+         
+        console.log("path of file-::::", req.file.path)
         // Read the uploaded Excel file and convert to JSON
         const jsonData = await csvtojson({ // Use файланализ option for correct Russian parsing
           delimiter: ',', // Adjust delimiter if needed
@@ -154,11 +157,12 @@ const uploadExcel = async (req, res, next)=>{
             'email'
             // ... other user properties
           ],
-        }).fromFile(req.body.file.path);
+        }).fromFile(req.file.path);
     
         // Validate data before insertion (optional)
         const validUsers = jsonData.filter(user => {
           // Implement validation logic for required fields, data types, etc.
+          console.log(user.name)
           return user.name && user.email;
         });
     
@@ -175,6 +179,20 @@ const uploadExcel = async (req, res, next)=>{
 
 }
 
+
+const newExample = new UserRole({
+    name: 'Sample name',
+    status: 'approved'
+
+})
+
+newExample.save().then(res=>{
+    console.log('added succussfully')
+})
+.catch(error=>{
+    console.log('error coming for enum')
+    console.log("Error-------     ", error)
+})
 
 
 
